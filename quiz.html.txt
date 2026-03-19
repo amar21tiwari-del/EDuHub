@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz</title>
+  <style>
+    body {background:#0b0f19; color:white; text-align:center;}
+    button {padding:10px; margin:10px; background:#3b82f6;}
+  </style>
+</head>
+
+<body>
+
+<h2>Physics Quiz</h2>
+
+<p>Unit of Force?</p>
+
+<button onclick="submitQuiz(0)">Joule</button>
+<button onclick="submitQuiz(1)">Newton</button>
+<button onclick="submitQuiz(0)">Watt</button>
+
+<script>
+function submitQuiz(score){
+  localStorage.setItem("score", score);
+  window.location.href = "result.html";
+}
+</script>
+
+</body>
+</html>

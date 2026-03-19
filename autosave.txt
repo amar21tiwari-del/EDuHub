@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result</title>
+</head>
+
+<body style="background:#0b0f19; color:white; text-align:center;">
+
+<h2>Your Result</h2>
+<p id="score"></p>
+
+<script>
+let s = localStorage.getItem("score");
+document.getElementById("score").innerText = "Score: " + s;
+
+// send to dashboard
+setTimeout(()=>{
+  window.location.href="dashboard.html";
+}, 2000);
+</script>
+
+</body>
+</html>
