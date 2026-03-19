@@ -2,14 +2,21 @@
 <html>
 <head>
   <title>Eduhub</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase v8 (simple & working) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <style>
     body {margin:0; font-family:Arial; background:#0b0f19; color:white;}
     header {display:flex; justify-content:space-between; padding:20px; background:#111827;}
-    button {padding:10px 20px; background:#3b82f6; border:none; color:white;}
-    .hero {text-align:center; padding:100px;}
+    button {padding:10px 20px; background:#3b82f6; border:none; color:white; margin:5px; cursor:pointer;}
+    input {padding:10px; margin:5px;}
+    .center {text-align:center; padding:40px;}
+    .hidden {display:none;}
+    .card {background:#1f2937; padding:20px; margin:20px; border-radius:10px;}
   </style>
 </head>
 
@@ -17,18 +24,146 @@
 
 <header>
   <h2>Eduhub</h2>
-  <button onclick="location.href='login.html'">Login</button>
 </header>
 
-<div class="hero">
+<!-- HOME -->
+<div id="home" class="center">
   <h1>Premium Learning Platform</h1>
-  <p>Serious learning. Real results.</p>
+  <p>Login to access quizzes and report cards</p>
+  <button onclick="showLogin()">Login / Sign Up</button>
 </div>
 
-<footer style="text-align:center; padding:20px;">
+<!-- LOGIN -->
+<div id="login" class="center hidden">
+  <h2>Login / Sign Up</h2>
+  <input id="email" placeholder="Email"><br>
+  <input id="pass" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Sign Up</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="center hidden">
+  <h2>Dashboard</h2>
+  <button onclick="startQuiz()">Start Quiz</button>
+  <button onclick="logout()">Logout</button>
+
+  <div id="report" class="card"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="center hidden">
+  <h2>Physics Quiz</h2>
+  <p>Unit of Force?</p>
+
+  <button onclick="submitQuiz(0)">Joule</button>
+  <button onclick="submitQuiz(1)">Newton</button>
+  <button onclick="submitQuiz(0)">Watt</button>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="center hidden">
+  <h2>Your Result</h2>
+  <p id="score"></p>
+  <button onclick="goDashboard()">Back to Dashboard</button>
+</div>
+
+<!-- CONTACT -->
+<footer class="center">
   📞 +917000705484 <br>
   📧 amar21tiwari@gmail.com
 </footer>
+
+<script>
+// 🔥 Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyARcJZshsEZm2NtANC7yp9cn2uxgd1he8Y",
+  authDomain: "eduhub-e9c4d.firebaseapp.com",
+  projectId: "eduhub-e9c4d",
+  storageBucket: "eduhub-e9c4d.firebasestorage.app",
+  messagingSenderId: "602507178983",
+  appId: "1:602507178983:web:fdcf43e3e8791211dfc342"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// UI functions
+function showLogin(){
+  hideAll();
+  document.getElementById("login").classList.remove("hidden");
+}
+
+function startQuiz(){
+  hideAll();
+  document.getElementById("quiz").classList.remove("hidden");
+}
+
+function goDashboard(){
+  hideAll();
+  document.getElementById("dashboard").classList.remove("hidden");
+  loadScores();
+}
+
+function hideAll(){
+  document.querySelectorAll("div").forEach(d=>d.classList.add("hidden"));
+}
+
+// AUTH
+function signup(){
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
+
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(()=> alert("Account Created"))
+    .catch(e=>alert(e.message));
+}
+
+function login(){
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(()=>{
+      hideAll();
+      document.getElementById("dashboard").classList.remove("hidden");
+      loadScores();
+    })
+    .catch(e=>alert(e.message));
+}
+
+function logout(){
+  auth.signOut();
+  location.reload();
+}
+
+// QUIZ
+function submitQuiz(score){
+  document.getElementById("score").innerText = "Score: " + score;
+
+  db.collection("scores").add({
+    score: score,
+    time: new Date().toLocaleString()
+  });
+
+  hideAll();
+  document.getElementById("result").classList.remove("hidden");
+}
+
+// REPORT
+function loadScores(){
+  let html = "<h3>Report Card</h3>";
+
+  db.collection("scores").get().then(data=>{
+    data.forEach(doc=>{
+      html += `<p>Score: ${doc.data().score}</p>`;
+    });
+
+    document.getElementById("report").innerHTML = html;
+  });
+}
+</script>
 
 </body>
 </html>
